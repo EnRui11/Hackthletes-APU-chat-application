@@ -6,21 +6,40 @@ import Checkbox from '@/components/Checkbox';
 
 const SignUp = ({ setIsSignUp }) => {
     //useState initialization
+    const [formData, setFormData] = useState({
+        email: '',
+        name: '',
+        password: '',
+        confirmPassword: '',
+        agreeEmail: false,
+        conditions: false,
+    });
     
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
         //handleChange function
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
     };
 
 
     const handleCheckboxChange = (field) => {
         //handleCheckboxChange function
+        console.log(formData[field]);
+        setFormData({ ...formData, [field]: !formData[field] });
     };
 
     const validateForm = () => {
         //validateForm function
+        if (!formData.email) return 'Email is required';
+        if (!formData.name) return 'Name is required';
+        if (!formData.password) return 'Password is required';
+        if (formData.password !== formData.confirmPassword)
+            return 'Passwords do not match';
+        if (!formData.conditions) return 'You must agree to Terms of Service';
+        return null;
     };
 
     const register = async (event) => {
@@ -69,12 +88,67 @@ const SignUp = ({ setIsSignUp }) => {
             <form onSubmit={register}>
                 {error && <p className='text-red-500 mb-4'>{error}</p>}
 
-                {/* Email Field */}
+                 {/* Email Field */}
+                 <Field
+                    className='mb-4.5'
+                    label='Email'
+                    name='email'
+                    type='email'
+                    placeholder='Enter your email'
+                    icon='email'
+                    value={formData.email}
+                    onChange={handleChange}
+                />
+
                 {/* Name Field */}
+                <Field
+                    className='mb-4.5'
+                    label='Name'
+                    name='name'
+                    type='text'
+                    placeholder='Enter your name'
+                    icon='name'
+                    value={formData.name}
+                    onChange={handleChange}
+                />
+
                 {/* Password Field */}
+                <Field
+                    className='mb-6.5'
+                    label='Password'
+                    name='password'
+                    type='password'
+                    placeholder='Enter your password'
+                    value={formData.password}
+                    onChange={handleChange}
+                />
+
                 {/* Confirm Password Field */}
+                <Field
+                    className='mb-6.5'
+                    label='Confirm Password'
+                    name='confirmPassword'
+                    type='password'
+                    placeholder='Password confirmation'
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                />
+
                 {/* Agree Email Checkbox */}
+                <Checkbox
+                    className='mb-3.5'
+                    label='I agree to receive email updates'
+                    value={formData.agreeEmail}
+                    onChange={() => handleCheckboxChange('agreeEmail')}
+                />
+
                 {/* Conditions Checkbox */}
+                <Checkbox
+                    className='mb-6.5'
+                    label='I have read and agree to Terms of Service'
+                    value={formData.conditions}
+                    onChange={() => handleCheckboxChange('conditions')}
+                />
 
                 <button
                     className='btn-purple btn-shadow w-full h-14'
@@ -83,6 +157,7 @@ const SignUp = ({ setIsSignUp }) => {
                 >
                     {isSubmitting ? 'Creating...' : 'Create account'}
                 </button>
+
             </form>
         </div>
     );

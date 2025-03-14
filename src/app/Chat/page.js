@@ -14,16 +14,37 @@ const ChatPage = ({ back, title }) => {
 
     //useState initialization
     //Start here
+    const [value, setValue] = useState('');
+    const [posts, setPosts] = useState([]);
+    const isSubscribed = useRef(false);
 
     const fetchPosts = async () => {
         //fetch Posts function
+        const response = await fetch('http:localhost:3000/api/posts');
+         const data = await response.json();
+         setPosts(data.items);
     };
 
     const submitPost = async () => {
         //submit Post function
+        const response = await fetch('http://localhost:3000/api/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                content: value,
+                likes: 0,
+                user: userStore.id,
+            }),
+        });
+        setValue('');
     };
 
     //useEffect for Fetching Messages
+    useEffect(() => {
+        fetchPosts();
+    }, []);
 
     // /useEffect for Real-Time Updates
     useEffect(() => {
@@ -98,33 +119,42 @@ const ChatPage = ({ back, title }) => {
                 </div>
 
                 <div className='flex shrink-0 w-[30rem] 4xl:w-[14.75rem] gap-2 mb-6'>
-                    {/* styling */}
-                    <button>
-                        <Icon name='check' />
-                        <span>Start Chat</span>
-                    </button>
-                    {/* styling */}
-                    <button>
-                        <Icon name='email' />
-                    </button>
-                    <button
-                        // styling
-                        onClick={() => {
-                            pb.realtime.unsubscribe();
-                            pb.authStore.clear();
-                            router.push('/');
-                        }}
-                    >
-                        <Icon name='arrow-up-right' />
-                    </button>
-                </div>
 
-                {/* CHAT INPUT */}
-                <div className='flex lg:flex-col-reverse'>
-                    <div className='flex-grow mr-30'>
-                        {/* Comment section  */}
-                    </div>
-                </div>
+                     <button className='btn-purple btn-medium grow'>
+                         <Icon name='check' />
+                         <span>Start Chat</span>
+                     </button>
+                     <button className='btn-purple btn-medium btn-square shrink-0 '>
+                         <Icon name='email' />
+                     </button>
+                     <button
+                         className='btn-purple btn-medium btn-square'
+                         onClick={() => {
+                             pb.realtime.unsubscribe();
+                             pb.authStore.clear();
+                             router.push('/');
+                         }}
+                     >
+                         <Icon name='arrow-up-right' />
+                     </button>
+                 </div>
+
+                 {/* CHAT INPUT */}
+                 <div className='flex lg:flex-col-reverse'>
+                     <div className='flex-grow mr-30'>
+                     {/* Comment section  */}
+                         <Comment
+                             className='mb-6'
+                             avatar='/images/avatars/avatar.jpeg'
+                             placeholder='Type to add something'
+                             value={value}
+                             setValue={(e) => setValue(e.target.value)}
+                             posts={posts}
+                             submitFunc={submitPost}
+                         />
+                     </div>
+                 </div>
+
             </div>
         </div>
     );
